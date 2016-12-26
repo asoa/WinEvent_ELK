@@ -1,0 +1,3 @@
+#TYPE Selected.System.Diagnostics.Eventing.Reader.EventLogRecord
+"TaskName","UserName","Id","Version","Level","Task","Opcode","Keywords","RecordId","ProviderName","ProviderId","LogName","ProcessId","ThreadId","MachineName","UserId","TimeCreated","ActivityId","RelatedActivityId","ContainerLog","LevelDisplayName","OpcodeDisplayName","TaskDisplayName"
+"\test","LAB\DoD_Admin","141","0","4","141","0","-9223372036854775808","2436","Microsoft-Windows-TaskScheduler","de7b24ea-73c8-4a09-985d-5bdadcfa9017","Microsoft-Windows-TaskScheduler/Operational","816","7368","lab-dc1.lab.local","S-1-5-18","12/24/2016 10:25:09 AM","a78f5104-5cc5-0001-33c0-93a7c55cd201",,"microsoft-windows-taskscheduler/operational","Information","Info","Task registration deleted"
