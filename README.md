@@ -20,9 +20,9 @@ corresponding firewall rules to allow the traffic.  Another way is to use Psexec
 ### Usage
 Again, this repo provides a docker-compose.yml file to quickly deploy an Elastic Stack using the official Elasticsearch,Logstash,and Kibana images hosted on https://hub.docker.com.  The requirements to deploy the Elastic Stack using the
 docker-compose.yml are:
-1. Install Docker
-2. Install Docker-compose version >= 1.6
-3. Clone this repository
+* Install Docker
+* Install Docker-compose version >= 1.6
+* Clone this repository
 
 Test data resides in ~/logstash/testData/ and will copied from your localhost to your Elastic Stack docker instance (/data) after you install docker, docker-compose, and run the command "docker-compose up" from the path the docker-compose.yml resides.  Please note that additions to 
 your Elastic Stack configuration Dockerfiles will be applied only when running "docker-compose build <image>" i.e. docker-compose build logstash
