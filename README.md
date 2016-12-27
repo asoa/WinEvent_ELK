@@ -3,8 +3,8 @@
 
 ### Why does this repo exist? 
 The problem this repo aims to provide a solution for is: How to aggregate widows event logs across an enterprise to detect cyber threat actor lateral movement activity?  This problem is expounded on in the following resources:
-http://www.deer-run.com/~hal/IREventLogAnalysis.pdf
-https://www.rapid7.com/resources/using-windows-event-logs-to-detect-lateral-movement/
+* http://www.deer-run.com/~hal/IREventLogAnalysis.pdf
+* https://www.rapid7.com/resources/using-windows-event-logs-to-detect-lateral-movement/
 
 ### Summary
 This repo contains scripts and configurations files to create a docker Elastic Stack (formerly ELK) single node deployment to ingest windows event logs used for security auditing.
