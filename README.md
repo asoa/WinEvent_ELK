@@ -12,7 +12,7 @@ The docker-compose.yml file and Elastic Stack conf files were derived from "http
 you through deploying a docker-compose Elastic Stack environment.
 
 ### PowerShell
-The PowerShell script uses PowerShell Remoting to distributively conduct parrallel "Invoke-Command" commands on remote computers to run the PowerShell cmdlet "Get-WinEvent" to get Windows Logs->Security, and
+The PowerShell script uses PowerShell Remoting to distributively conduct parallel "Invoke-Command" commands on remote computers to run the PowerShell cmdlet "Get-WinEvent" to get Windows Logs->Security, and
 Application and Services Logs->TaskScheduler.  The PowerShell script requires PS-Remoting to be enabled in the windows environment; See PowerShell help file "get-help about_Remote_Requirements" for more information about
 the requirements to enable PowerShell Remoting.  In summary, you have to enable PS-Remoting on all computers that the script will run on.  The easiest way to do this is to create a GPO that enables the WinRM service and 
 corresponding firewall rules to allow the traffic.  Another way is to use Psexec to programmatically run "winrm.cmd quickconfig -q" on remote computers.
