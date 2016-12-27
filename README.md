@@ -25,10 +25,12 @@ docker-compose.yml are:
 * Clone this repository
 
 Test data resides in ~/logstash/testData/ and will copied from your localhost to your Elastic Stack docker instance (/data) after you install docker, docker-compose, and run the command "docker-compose up" from the path the docker-compose.yml resides.  Please note that additions to 
-your Elastic Stack configuration Dockerfiles will be applied only when running "docker-compose build <image>" i.e. docker-compose build logstash
+your Elastic Stack configuration Dockerfiles will be applied only when running "docker-compose build \<image\>" i.e. docker-compose build logstash
 
-Running docker-compose up will build your Elastic Stack and expose Kibana on http://localhost:5601.  You can analyze the test data logs in Kibana by setting the Kibana absolute time range from 23 Dec 16 - 25 Dec 16.  You can add your own event logs
+Running "docker-compose up" will build your Elastic Stack and expose Kibana on http://localhost:5601.  You can analyze the test data logs in Kibana by setting the Kibana absolute time range from 23 Dec 16 - 25 Dec 16.  You can add your own event logs
 by running "get-eventLogs_v6.ps1" in your windows environment and adding the csv files to ~/logstash/testData/.
+
+Running "docker-compose down" destroys your environment and all volumes (docker storage).  This is what makes developing in docker so powerful--you can build/test/destroy an Elastic Stack in literally seconds.
 
 The Elastic Stack (Logstash) currently is capable of parsing the following windows event logs retrieved using the repo's PowerShell script "get-eventLogs_v6.ps1":
 - (4624) logon
