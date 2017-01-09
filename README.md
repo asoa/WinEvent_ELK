@@ -23,6 +23,7 @@ docker-compose.yml are:
 * Install Docker
 * Install Docker-compose version >= 1.6
 * Clone this repository
+* Run this command on docker host: sudo sysctl -w vm.max_map_count=262144
 
 Test data resides in ~/logstash/testData/ and will copied from your localhost to your Elastic Stack docker instance (/data) after you install docker, docker-compose, and run the command "docker-compose up" from the path the docker-compose.yml resides.  Please note that additions to 
 your Elastic Stack configuration Dockerfiles will be applied only when running "docker-compose build \<image\>" i.e. docker-compose build logstash
