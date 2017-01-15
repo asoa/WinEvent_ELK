@@ -1,5 +1,5 @@
 filter {
-	if "taskCompleted" in [path] {
+	if [type] == "task_completed" {
 
 		if [message] =~ /^#TYPE/ {
 		    drop {}
@@ -15,7 +15,7 @@ filter {
 		}
 
 		mutate {
-			add_tag => ["task_completed"]
+			add_tag => ["wev"]
 		}
 
 		# Convert TimeCreated field into Kibana compliant format
