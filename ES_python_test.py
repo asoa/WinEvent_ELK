@@ -36,3 +36,19 @@ response = client.search(
 for hit in response['hits']['hits']:
     # print(hit)
     print(hit["_source"]['MachineName'],hit["_source"]['TargetDomainName'],hit["_source"]['TargetUserName'],hit["_source"]['type'],'TimeCreated')
+
+# Output returned to console from query (TargetDomainName:LAB) to index logstash*
+
+"""
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logon', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logon', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logoff', 'TimeCreated')
+(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
+"""
+
