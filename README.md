@@ -46,3 +46,10 @@ The Elastic Stack (Logstash) currently is capable of parsing the following windo
 
 The logstash conf files to parse the event logs listed above are in ~/logstash/conf and are mapped (docker volumes) from your local host to the Elastic Stack docker container at runtime
 
+### Elasticsearch-py Library
+
+From the docs: "Official low-level client for Elasticsearch. Its goal is to provide common ground for all Elasticsearch-related code in Python; because of this it tries to be opinion-free and very extendable.
+For a more high level client library with more limited scope, have a look at elasticsearch-dsl - it is a more pythonic library sitting on top of elasticsearch-py."
+
+How this project uses elasticsearch-py: to programmatically query data in the elasticsearch database using Apache Lucene syntax to "find all the things." 
+
