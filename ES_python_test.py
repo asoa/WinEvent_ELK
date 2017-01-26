@@ -13,6 +13,16 @@ response = client.search(
     index="logstash*",
     body={
         "size": 500,  # specify how many records to return that match the query
+
+        "sort": [
+            {
+                "@timestamp": {
+                    "order": "desc",
+                    "unmapped_type": "boolean"
+                }
+            }
+        ],
+
         "query": {
             "bool": {
               "must": [
@@ -33,7 +43,7 @@ response = client.search(
               ],
               "must_not": []
             }
-          }
+        }
     }
 
 )
@@ -46,10 +56,15 @@ for hit in response['hits']['hits']:
 
 """
 bob-win7.lab.local LAB DoD_Admin logoff 12/25/2016 1:52:43 AM
+bob-win7.lab.local LAB DoD_Admin logoff 12/25/2016 1:52:43 AM
 bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:48:46 PM
+bob-win7.lab.local LAB DoD_Admin logon 12/24/2016 10:48:30 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:56 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:55 PM
+bob-win7.lab.local LAB DoD_Admin logon 12/24/2016 10:46:46 PM
+bob-win7.lab.local LAB DoD_Admin logon 12/24/2016 10:46:45 PM
+bob-win7.lab.local LAB DoD_Admin logon 12/24/2016 10:46:45 PM
 bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:35 PM
-bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:20 PM
-bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:45:40 PM
-bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:35:18 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:30 PM
 """
 
