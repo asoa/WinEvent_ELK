@@ -1,13 +1,18 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 from datetime import datetime
 from elasticsearch import Elasticsearch
 
 client = Elasticsearch()
 
+"""
+The search function json
+"""
 response = client.search(
     index="logstash*",
     body={
+        "size": 500,  # specify how many records to return that match the query
         "query": {
             "bool": {
               "must": [
@@ -29,26 +34,22 @@ response = client.search(
               "must_not": []
             }
           }
-    },
+    }
 
 )
 
 for hit in response['hits']['hits']:
     # print(hit)
-    print(hit["_source"]['MachineName'],hit["_source"]['TargetDomainName'],hit["_source"]['TargetUserName'],hit["_source"]['type'],'TimeCreated')
+    print(hit["_source"]['MachineName'],hit["_source"]['TargetDomainName'],hit["_source"]['TargetUserName'],hit["_source"]['type'],hit["_source"]['TimeCreated'])
 
 # Output returned to console from query (TargetDomainName:LAB) to index logstash*
 
 """
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logon', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logon', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logon', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'alexander.bailey.sa', u'logoff', 'TimeCreated')
-(u'bob-win7.lab.local', u'LAB', u'DoD_Admin', u'logoff', 'TimeCreated')
+bob-win7.lab.local LAB DoD_Admin logoff 12/25/2016 1:52:43 AM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:48:46 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:35 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:46:20 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:45:40 PM
+bob-win7.lab.local LAB DoD_Admin logoff 12/24/2016 10:35:18 PM
 """
 
