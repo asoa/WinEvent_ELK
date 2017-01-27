@@ -97,13 +97,13 @@ if __name__ == "__main__":
 # Output returned to console from query " * "  to index logstash* matching on all documents tagged with "process" label
 
 """
-12/24/2016 8:33:12 AM C:\Windows\System32\slui.exe "C:\windows\System32\SLUI.exe" RuleId=eeba1977-569e-4571-b639-7623d8bfecc0;Action=AutoActivate;AppId=55c92734-d682-4d71-983e-d6ec3f16059f;SkuId=b3ca044e-a358-4d68-9883-aaa2941aca99;NotificationInterval=1440;Trigger=NetworkAvailable
-12/24/2016 8:33:12 AM C:\Windows\System32\SppExtComObj.Exe C:\windows\system32\SppExtComObj.exe -Embedding
-12/24/2016 8:33:12 AM C:\Windows\System32\sppsvc.exe C:\windows\system32\sppsvc.exe
-12/24/2016 8:32:51 AM C:\Windows\System32\calc.exe C:\Windows\System32\calc.exe
-12/24/2016 8:32:11 AM C:\Windows\System32\MRT.exe C:\windows\system32\MRT.exe /EHB /Q
-12/24/2016 8:32:11 AM C:\Windows\System32\taskhostex.exe taskhostex.exe Regular
-12/24/2016 8:31:51 AM C:\Windows\System32\calc.exe C:\Windows\System32\calc.exe
+(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\slui.exe', u'"C:\\windows\\System32\\SLUI.exe" RuleId=eeba1977-569e-4571-b639-7623d8bfecc0;Action=AutoActivate;AppId=55c92734-d682-4d71-983e-d6ec3f16059f;SkuId=b3ca044e-a358-4d68-9883-aaa2941aca99;NotificationInterval=1440;Trigger=NetworkAvailable')
+(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\sppsvc.exe', u'C:\\windows\\system32\\sppsvc.exe')
+(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe network')
+(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\conhost.exe', u'\\??\\C:\\windows\\system32\\conhost.exe 0xffffffff')
+(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\sc.exe', u'C:\\windows\\system32\\sc.exe start wuauserv')
+(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe USER')
+(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe SYSTEM')
 """
 
 #TODO: create function to match on processess not residing in C:\Windows\System32\ and output to file
