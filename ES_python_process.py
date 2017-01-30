@@ -23,30 +23,28 @@ def check_sys32(hit):
     return False
 
 
-def get_sys32(hit_list):  # generator to iterate over all hits
+def get_sys32(hit_list):
     suspect_exe = []
     good_hit_dict = {}
-    hits = (hit[1] for hit in hit_list)
+    hits = (hit[1] for hit in hit_list)  # generator to iterate over all hits
     for hit in hits:
         good_hit_exe = check_sys32(hit)
-        if good_hit_exe:
-            # add binary to dictionary or increment count if found
+        if good_hit_exe:  # add binary to dictionary or increment count if found
             good_bin = hit.split("\\")[-1]
             if good_bin in good_hit_dict.keys():
                 good_hit_dict[good_bin] += 1
             else:
                 good_hit_dict[good_bin] = 1
         else:
-            # prints path to interesting binary to screen
-            # print("I might be bad, check me out: {}".format(hit))
-            suspect_exe.append(hit)
+            suspect_exe.append(hit)  # add suspect binary to list
 
-    # prints the count of "good binaries"
+    # create dict sorted on hit count
     ordered_good_hit_dict = sorted(good_hit_dict.items(), key=operator.itemgetter(1), reverse=True)
-    # print(ordered_good_hit_dict)
-    return suspect_exe, ordered_good_hit_dict
+    return suspect_exe, ordered_good_hit_dict  # return list and dict to caller
 
-def query_elasticsearch(query, q_size, start_time, end_time):  # json request was derived from Kibana dispayed request; click on " ^ " under histogram on Discover tab
+
+def query_elasticsearch(query, q_size, start_time, end_time):
+    # json request was derived from Kibana dispayed request; click on " ^ " under histogram on Discover tab
     response = client.search(
         index="logstash*",
         body={
@@ -100,7 +98,7 @@ def get_epoch(s_time, e_time):  # convert date format to epoch
     pattern = '%d %m %Y %H:%M:%S'
     start_time = int(time.mktime(time.strptime(s_time, pattern)))
     end_time = int(time.mktime(time.strptime(e_time, pattern)))
-    return str(start_time) + "000", str(end_time) + "000"
+    return str(start_time) + "000", str(end_time) + "000"  # add padding (milliseconds) to epoch time
 
 
 def parse_args():
@@ -112,6 +110,7 @@ def parse_args():
     args = parser.parse_args()
     if args.query is None or args.q_size is None or args.s_time is None or args.e_time is None:
         print(parser.usage)
+        print("Example: ./ES_python_process.py -s_time '23 12 2016 04:19:00' -e_time '25 12 2016 04:34:00' -s 1000")
         exit(0)
     return args.query, args.q_size, args.s_time, args.e_time
 
@@ -127,7 +126,7 @@ def main():
     suspect_exe, ordered_good_hit_dict = get_sys32(hits)
     print("********* The following binaries aren't in the whitelist path(s) *********")
     print(*suspect_exe, sep="\n")
-    print("********* Count of all binaries seen in the selected time frame *********")
+    print("********* Descending count of all binaries seen in the selected time frame *********")
     print(*ordered_good_hit_dict, sep="\n")
 
 if __name__ == "__main__":
