@@ -6,8 +6,7 @@ Purpose: this script uses the elasticsearch query API to fetch data from a local
  execution count.
 
 #TODO: output processes not residing in C:\Windows\System32\ to csv
-#TODO: create function tokenize process name only and check against white|black lists
-#TODO: create function to check processes against mutated black-list
+#TODO: create function to tokenize process name only and check against white,black,mutated lists
 #TODO: output count of legitimate process execution to csv
 #TODO: create function to set start|end default time to last 24 hours
 #TODO: output hits to csv file
