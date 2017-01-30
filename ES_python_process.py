@@ -1,15 +1,50 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
-from __future__ import print_function
+
 from datetime import datetime
 from elasticsearch import Elasticsearch
 import argparse
 import sys
 import time
 import csv
+import re
+import operator
+
 
 client = Elasticsearch()
 
+
+def check_sys32(hit):
+    # add additional white-list path patterns to white_list
+    white_list = re.compile(r'C:\\Windows\\System32\\|C:\\Program Files\\Windows NT\\Accessories\\|<add another pattern here>')
+    found = white_list.search(hit)
+    if found:
+        return True
+    return False
+
+
+def get_sys32(hit_list):  # generator to iterate over all hits
+    suspect_exe = []
+    good_hit_dict = {}
+    hits = (hit[1] for hit in hit_list)
+    for hit in hits:
+        good_hit_exe = check_sys32(hit)
+        if good_hit_exe:
+            # add binary to dictionary or increment count if found
+            good_bin = hit.split("\\")[-1]
+            if good_bin in good_hit_dict.keys():
+                good_hit_dict[good_bin] += 1
+            else:
+                good_hit_dict[good_bin] = 1
+        else:
+            # prints path to interesting binary to screen
+            # print("I might be bad, check me out: {}".format(hit))
+            suspect_exe.append(hit)
+
+    # prints the count of "good binaries"
+    ordered_good_hit_dict = sorted(good_hit_dict.items(), key=operator.itemgetter(1), reverse=True)
+    # print(ordered_good_hit_dict)
+    return suspect_exe, ordered_good_hit_dict
 
 def query_elasticsearch(query, q_size, start_time, end_time):  # json request was derived from Kibana dispayed request; click on " ^ " under histogram on Discover tab
     response = client.search(
@@ -82,32 +117,26 @@ def parse_args():
 
 
 def main():
+    hits = []
     query, size, s_time, e_time = parse_args()
     start_time, end_time = get_epoch(s_time, e_time)
     response = query_elasticsearch(query, size, start_time, end_time)
     for hit in response['hits']['hits']:
         hit_tuple = (hit["_source"]["TimeCreated"], hit["_source"]["NewProcessName"], hit["_source"]["CommandLine"])
-        print(hit_tuple)
-        #print(hit["_source"]["TimeCreated"], hit["_source"]["NewProcessName"], hit["_source"]["CommandLine"])
+        hits.append(hit_tuple)
+    suspect_exe, ordered_good_hit_dict = get_sys32(hits)
+    print("********* The following binaries aren't in the whitelist path(s) *********")
+    print(*suspect_exe, sep="\n")
+    print("********* Count of all binaries seen in the selected time frame *********")
+    print(*ordered_good_hit_dict, sep="\n")
 
 if __name__ == "__main__":
     main()
 
 
-# Output returned to console from query " * "  to index logstash* matching on all documents tagged with "process" label
-
-"""
-(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\slui.exe', u'"C:\\windows\\System32\\SLUI.exe" RuleId=eeba1977-569e-4571-b639-7623d8bfecc0;Action=AutoActivate;AppId=55c92734-d682-4d71-983e-d6ec3f16059f;SkuId=b3ca044e-a358-4d68-9883-aaa2941aca99;NotificationInterval=1440;Trigger=NetworkAvailable')
-(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\sppsvc.exe', u'C:\\windows\\system32\\sppsvc.exe')
-(u'12/23/2016 4:52:23 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe network')
-(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\conhost.exe', u'\\??\\C:\\windows\\system32\\conhost.exe 0xffffffff')
-(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\sc.exe', u'C:\\windows\\system32\\sc.exe start wuauserv')
-(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe USER')
-(u'12/23/2016 4:52:14 PM', u'C:\\Windows\\System32\\taskhost.exe', u'taskhost.exe SYSTEM')
-"""
-
 #TODO: create function to match on processess not residing in C:\Windows\System32\ and output to file
 #TODO: create function tokenize process name only and check against white|black lists
+#TODO: create function to check processess against mutated black-list
 #TODO: create function to count occurences of process and output to file
 #TODO: create function to set start|end default time to last 24 hours
 #TODO: output hits to csv file
