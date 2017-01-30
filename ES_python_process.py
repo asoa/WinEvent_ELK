@@ -1,5 +1,18 @@
 #! /usr/bin/env python3
+"""
+Purpose: this script uses the elasticsearch query API to fetch data from a local elasticsearch instance using standard
+ Lucene syntax.  Specifically, this script queries for windows event log process data with label type:"process".  The
+ script prints to the screen processes executed from filesystem paths not in the whitelist and legitimate process
+ execution count.
 
+#TODO: output processes not residing in C:\Windows\System32\ to csv
+#TODO: create function tokenize process name only and check against white|black lists
+#TODO: create function to check processes against mutated black-list
+#TODO: output count of legitimate process execution to csv
+#TODO: create function to set start|end default time to last 24 hours
+#TODO: output hits to csv file
+
+"""
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
@@ -132,11 +145,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-#TODO: create function to match on processess not residing in C:\Windows\System32\ and output to file
-#TODO: create function tokenize process name only and check against white|black lists
-#TODO: create function to check processess against mutated black-list
-#TODO: create function to count occurences of process and output to file
-#TODO: create function to set start|end default time to last 24 hours
-#TODO: output hits to csv file
 
