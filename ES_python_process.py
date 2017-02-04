@@ -1,18 +1,19 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 """
 Purpose: this script uses the elasticsearch query API to fetch data from a local elasticsearch instance using standard
  Lucene syntax.  Specifically, this script queries for windows event log process data with label type:"process".  The
  script prints to the screen processes executed from filesystem paths not in the whitelist and legitimate process
  execution count.
 
-#TODO: output processes not residing in C:\Windows\System32\ to csv
 #TODO: create function to tokenize process name only and check against white,black,mutated lists
-#TODO: output count of legitimate process execution to csv
 #TODO: create function to set start|end default time to last 24 hours
-#TODO: output hits to csv file
+#TODO: (complete) output processes not residing in white_list to csv
+#TODO: (complete) output count of legitimate process execution to csv
+#TODO: (complete) output hits to csv file
 
 """
 
+from __future__ import print_function
 from datetime import datetime
 from elasticsearch import Elasticsearch
 import argparse
@@ -21,12 +22,13 @@ import time
 import csv
 import re
 import operator
+import os
 
 
 client = Elasticsearch()
 
 
-def check_sys32(hit):
+def check_white_list(hit):
     # add additional white-list path patterns to white_list
     white_list = re.compile(r'C:\\Windows\\System32\\|C:\\Program Files\\Windows NT\\Accessories\\|<add another pattern here>')
     found = white_list.search(hit)
@@ -35,14 +37,15 @@ def check_sys32(hit):
     return False
 
 
-def get_sys32(hit_list):
+def classify_bins(hit_list):  # classifies binary path as either suspect or good
     suspect_exe = []
     good_hit_dict = {}
     hits = (hit[1] for hit in hit_list)  # generator to iterate over all hits
-    for hit in hits:
-        good_hit_exe = check_sys32(hit)
+    # for hit in hits:
+    for hit in hit_list:
+        good_hit_exe = check_white_list(hit[3])  # check binary path against white-list
         if good_hit_exe:  # add binary to dictionary or increment count if found
-            good_bin = hit.split("\\")[-1]
+            good_bin = hit[3].split("\\")[-1]
             if good_bin in good_hit_dict.keys():
                 good_hit_dict[good_bin] += 1
             else:
@@ -133,15 +136,36 @@ def main():
     start_time, end_time = get_epoch(s_time, e_time)
     response = query_elasticsearch(query, size, start_time, end_time)
     for hit in response['hits']['hits']:
-        hit_tuple = (hit["_source"]["TimeCreated"], hit["_source"]["NewProcessName"], hit["_source"]["CommandLine"])
+        hit_tuple = (hit["_source"]["TimeCreated"], hit["_source"]["MachineName"], hit["_source"]["SubjectUserName"], hit["_source"]["NewProcessName"], hit["_source"]["CommandLine"])
+        # print(hit_tuple)
         hits.append(hit_tuple)
-    suspect_exe, ordered_good_hit_dict = get_sys32(hits)
-    print("********* The following binaries aren't in the whitelist path(s) *********")
-    print(*suspect_exe, sep="\n")
-    print("********* Descending count of all binaries seen in the selected time frame *********")
-    print(*ordered_good_hit_dict, sep="\n")
+    suspect_exe, ordered_good_hit_dict = classify_bins(hits)
+
+    # create csv file and write binary paths that aren't in whitelist
+    date_time = datetime.now().isoformat()
+    with open("suspect_" + date_time + ".csv", "wt") as f:
+        writer = csv.writer(f)
+        writer.writerow(('TimeCreated','MachineName','UserName','ProcessName','CommandLine'))
+        for suspect_path in suspect_exe:
+            writer.writerow((suspect_path[0], suspect_path[1], suspect_path[2], suspect_path[3], suspect_path[4]))
+    print("{} suspect binary paths written to {}".format(len(suspect_exe), os.path.abspath("suspect.csv")))
+    # print(open("suspect.csv", 'rt').read())
+
+    with open("legit_" + date_time + ".csv", "wt") as f:
+        writer = csv.writer(f)
+        writer.writerow(('LegitBin','Count'))
+        for hit in ordered_good_hit_dict:
+            legit_bin = hit[0]
+            count = hit[1]
+            writer.writerow((legit_bin,count))
+    print("{} legit binaries and counts written to {}".format(len(ordered_good_hit_dict), os.path.abspath("legit.csv")))
+    # print(open("legit.csv", 'rt').read())
+
+    # print("********* The following binaries aren't in the whitelist path(s) *********")
+    # print(*suspect_exe, sep="\n")
+    # print("********* Descending count of all binaries seen in the selected time frame *********")
+    # print(*ordered_good_hit_dict, sep="\n")
 
 if __name__ == "__main__":
     main()
-
 
