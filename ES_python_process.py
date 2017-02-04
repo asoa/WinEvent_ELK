@@ -2,8 +2,10 @@
 """
 Purpose: this script uses the elasticsearch query API to fetch data from a local elasticsearch instance using standard
  Lucene syntax.  Specifically, this script queries for windows event log process data with label type:"process".  The
- script prints to the screen processes executed from filesystem paths not in the whitelist and legitimate process
- execution count.
+ script writes 2 csv files to the current working directory:
+
+    - suspect_<date>.csv: processes executed from filesystem paths not in the whitelist
+    - legit_<date>.csv: legitimate processes execution count
 
 #TODO: create function to tokenize process name only and check against white,black,mutated lists
 #TODO: create function to set start|end default time to last 24 hours
