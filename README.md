@@ -33,7 +33,7 @@ by running "get-eventLogs.ps1" in your windows environment and adding the csv fi
 
 Running "docker-compose down" destroys your environment and all volumes (docker storage).  This is what makes developing in docker so powerful--you can build/test/destroy an Elastic Stack in literally seconds.
 
-The Elastic Stack (Logstash) currently is capable of parsing the following windows event logs retrieved using the repo's PowerShell script "get-eventLogs_v6.ps1":
+The Elastic Stack (Logstash) currently is capable of parsing the following windows event logs retrieved using the repo's PowerShell script "get-eventLogs.ps1":
 - (4624) logon
 - (4634) logoff
 - (4688) new process creation
