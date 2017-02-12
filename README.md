@@ -29,7 +29,7 @@ Test data resides in ~/logstash/testData/ and will copied from your localhost to
 your Elastic Stack configuration Dockerfiles will be applied only when running "docker-compose build \<image\>" i.e. docker-compose build logstash
 
 Running "docker-compose up" will build your Elastic Stack and expose Kibana on http://localhost:5601.  You can analyze the test data logs in Kibana by setting the Kibana absolute time range from 23 Dec 16 - 25 Dec 16.  You can add your own event logs
-by running "get-eventLogs_v6.ps1" in your windows environment and adding the csv files to ~/logstash/testData/.
+by running "get-eventLogs.ps1" in your windows environment and adding the csv files to ~/logstash/testData/.
 
 Running "docker-compose down" destroys your environment and all volumes (docker storage).  This is what makes developing in docker so powerful--you can build/test/destroy an Elastic Stack in literally seconds.
 
