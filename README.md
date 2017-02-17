@@ -35,6 +35,7 @@ Running "docker-compose down" destroys your environment and all volumes (docker 
 
 The Elastic Stack (Logstash) currently is capable of parsing the following windows event logs retrieved using the repo's PowerShell script "get-eventLogs.ps1":
 - (4624) logon
+- (4625) failed logon
 - (4634) logoff
 - (4688) new process creation
 - (4648) runas command
