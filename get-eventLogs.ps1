@@ -1,4 +1,4 @@
-﻿function Get-LogsWorker {
+﻿Function Get-LogsWorker {
     #param([string]$computername)
     Param (
         [Parameter(Position=0)]
@@ -34,39 +34,28 @@
             }            
  
             if ($ID -eq 4624) {
-                $Global:log_ID["log"] = "logon"
                 $Events | Select-Object -Property TargetUserSid,TargetUserName,TargetDomainName,TargetLogonId,LogonType,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName  # Only selects specified attributes
                 LogWrite_success "$computer logon scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq [int]4634) {
-                $Global:log_ID["log"] = "logoff"
                 $Events | Select-Object -Property TargetUserSid,TargetUserName,TargetDomainName,TargetLogonId,LogonType,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName  # Only selects specified attributes
                 LogWrite_success "$computer logoff scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq [int]4625) {
                 $Global:log_ID["log"] = "failed_logon"
                 $Events | Select-Object -Property  SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,TargetUserSid,TargetUserName,TargetDomainName,Status,FailureReason,SubStatus,LogonType,LogonProcessName,AuthenticationPackageName,WorkstationName,KeyLength,ProcessId,ProcessName,IpAddress,IpPort,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated
                 LogWrite_success "$computer failed_logon scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq [int]4688) {
-                $Global:log_ID["log"] = "process"
                 $Events | Select-Object -Property SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,NewProcessId,NewProcessName,TokenElevationType,ProcessId,CommandLine,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
                 LogWrite_success "$computer process scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq "4648") {
-                $Global:log_ID["log"] = "runas"
                 $Events | Select-Object -Property SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,LogonGuid,TargetUserName,TargetDomainName,TargetLogonGuid,TargetServerName,TargetInfo,ProcessId,ProcessName,IpAddress,IpPort,Id,Version,Qualifiers,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
                 LogWrite_success "$computer runas scan completed"
-                #Write-Host $Global:log_ID["runas"]
             } elseif ($ID -eq "4672") {
-                $Global:log_ID["log"] = "admin"
                 foreach ($event in $Events) {
                     $privs = $event.PrivilegeList -replace '[\t\t\t]',''
                     $parsedPrivs = ParseAdminLogs $event $privs
                     $parsedPrivs | Select-Object *
                 }
                 LogWrite_success "$computer admin scan completed"
-                #Write-Host $Global:log_ID["admin"]
             } else {
                 $Events | Select-Object *
                 LogWrite_success "$computer $ID scan completed"
@@ -111,21 +100,15 @@
             }
             
             if ($ID -eq 106) {
-                $Global:log_ID["log"] = "taskCreated"
                 $Events | Select-Object TaskName,UserContext,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
                 LogWrite_success "$computer taskCreated scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq 200) {
-                $Global:log_ID["log"] = "taskStarted"
                 $Events | Select-Object -Property TaskName,ActionName,TaskInstanceId,EnginePID,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
                 LogWrite_success "$computer taskStarted scan completed"
-                #Write-Host $Global:log_ID["log"]
             } elseif ($ID -eq 201) {
-                $Global:log_ID["log"] = "taskCompleted"
                 $Events | Select-Object -Property TaskName,TaskInstanceId,ActionName,ResultCode,EnginePID,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
                 LogWrite_success "$computer taskCompleted scan completed"
             } elseif ($ID -eq 141) {
-                $Global:log_ID["log"] = "taskDeleted"
                 $Events | Select-Object -Property TaskName,UserName,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName 
                 LogWrite_success "$computer taskDeleted scan completed"
             } else {
@@ -144,6 +127,51 @@
                 LogWrite_failure "$computer EventID:$ID $_"         
             }  
         }
+        Return
+    }
+    
+    $taskArray = @(7045)
+    if ($taskArray -like $ID) {
+        Try { 
+            if ($time -like "hours") {
+                $hours = (Get-Date).AddHours(-1)  # AddHours function subtracts X hour from current time
+                $filter = @{Logname="System";Id=$ID;StartTime=$hours}  
+            } else {
+                $days = (Get-Date).AddDays(-1)  # AddDays function subtracs X days from current time
+                $filter = @{Logname="System";Id=$ID;StartTime=$days}
+            }
+
+            $Events = Get-WinEvent -ComputerName $computer -FilterHashtable $filter -ErrorAction Stop   
+                     
+            ForEach ($Event in $Events) {  
+                # Convert the event to XML            
+                $eventXML = [xml]$Event.ToXml()            
+                # Iterate through each one of the XML message properties            
+                For ($i=0; $i -lt $eventXML.Event.EventData.Data.Count; $i++) {            
+                    # Append these as object properties            
+                    Add-Member -InputObject $Event -MemberType NoteProperty -Force -Name $eventXML.Event.EventData.Data[$i].name -Value $eventXML.Event.EventData.Data[$i].'#text'           
+                }            
+            }
+            
+            if ($ID -eq 7045) {
+                $Events | Select-Object ServiceName,ImagePath,ServiceType,StartType,AccountName,Id,Version,Qualifiers,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ContainerLog
+                LogWrite_success "$computer serviceCreated scan completed"
+            } else {
+               $Events | Select-Object *
+               LogWrite_success "$computer $ID scan completed"
+               Write-Host "You selected an event ID that has not been normalized (i.e. the columns are jacked up)"  
+            }
+        }
+                
+        Catch {
+            if ($_.Exception -like "*No events were found that match criteria*") {           
+                Write-Warning "[$computer] $_" # TODO: create log file with failed event ID, computername, time, etc           
+                LogWrite_failure "[$computer]: no events found" 
+            } else {            
+                Write-Warning "[$computer] Event ID:$ID $_"  # Something bad happened
+                LogWrite_failure "$computer EventID:$ID $_"         
+            }  
+        }
     }
     
     else {
@@ -151,6 +179,7 @@
         LogWrite_failure "[$computer]: I don't know how to process EventID:$ID"
     }
 }
+   
 
 
 $log_ID = @{} 
@@ -245,6 +274,7 @@ $hash_table = @{
     taskExecuted = 200
     taskCompleted = 201
     taskDeleted = 141
+    serviceCreated = 7045
 }
 
 foreach ($log_type in $hash_table.GetEnumerator()) {
@@ -281,16 +311,17 @@ $USER = [Environment]::UserName
 
 ## Windows Event IDs to detect SMB lateral movement ##
 
-#(4624) Logon
-#(4634) Logoff
-#(4688) New process creation
+#(4624) logon
+#(4634) logoff
+#(4625) failed login
+#(4688) new process creation
 #(4648) runas command
 #(4672) admin rights
 #(106) task scheduled
 #(200) task executed
 #(201) task completed
 #(141) task removed
+#(7045) service created
 
 # TODO (have not completed yet)
-#(601,4697) # service creation 
 #(5140) # network share 
