@@ -1,4 +1,5 @@
-﻿Function Get-LogsWorker {
+﻿# called from Get-Logs function 
+Function Get-LogsWorker {
     #param([string]$computername)
     Param (
         [Parameter(Position=0)]
@@ -10,7 +11,7 @@
     )
 
     $secArray = @(4624,4625,4634,4688,4648,4672)
-    if ($secArray -like $ID) {
+    if ($secArray -like $ID) {  # checks to see if passed $ID parameter matches any of the items in $secArray
         Try { 
             if ($time -like "hours") {
                 $hours = (Get-Date).AddHours(-1)  # AddHours function subtracts X hour from current time
@@ -33,32 +34,32 @@
                 }            
             }            
  
+            # condition checks to match Select-Object filtering to specified event ID
             if ($ID -eq 4624) {
                 $Events | Select-Object -Property TargetUserSid,TargetUserName,TargetDomainName,TargetLogonId,LogonType,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName  # Only selects specified attributes
-                LogWrite_success "$computer logon scan completed"
+                LogWrite_success "[$computer] logon scan completed"
             } elseif ($ID -eq [int]4634) {
                 $Events | Select-Object -Property TargetUserSid,TargetUserName,TargetDomainName,TargetLogonId,LogonType,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName  # Only selects specified attributes
-                LogWrite_success "$computer logoff scan completed"
+                LogWrite_success "[$computer] logoff scan completed"
             } elseif ($ID -eq [int]4625) {
-                $Global:log_ID["log"] = "failed_logon"
                 $Events | Select-Object -Property  SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,TargetUserSid,TargetUserName,TargetDomainName,Status,FailureReason,SubStatus,LogonType,LogonProcessName,AuthenticationPackageName,WorkstationName,KeyLength,ProcessId,ProcessName,IpAddress,IpPort,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated
-                LogWrite_success "$computer failed_logon scan completed"
+                LogWrite_success "[$computer] failed_logon scan completed"
             } elseif ($ID -eq [int]4688) {
                 $Events | Select-Object -Property SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,NewProcessId,NewProcessName,TokenElevationType,ProcessId,CommandLine,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
-                LogWrite_success "$computer process scan completed"
+                LogWrite_success "[$computer] process scan completed"
             } elseif ($ID -eq "4648") {
                 $Events | Select-Object -Property SubjectUserSid,SubjectUserName,SubjectDomainName,SubjectLogonId,LogonGuid,TargetUserName,TargetDomainName,TargetLogonGuid,TargetServerName,TargetInfo,ProcessId,ProcessName,IpAddress,IpPort,Id,Version,Qualifiers,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
-                LogWrite_success "$computer runas scan completed"
-            } elseif ($ID -eq "4672") {
+                LogWrite_success "[$computer] runas scan completed"
+            } elseif ($ID -eq "4672") {  # PrivilegeList field is tab delimited; calls ParseAdminLogs fucntion to replace "\t" with "-" 
                 foreach ($event in $Events) {
                     $privs = $event.PrivilegeList -replace '[\t\t\t]',''
                     $parsedPrivs = ParseAdminLogs $event $privs
                     $parsedPrivs | Select-Object *
                 }
-                LogWrite_success "$computer admin scan completed"
+                LogWrite_success "[$computer] admin scan completed"
             } else {
                 $Events | Select-Object *
-                LogWrite_success "$computer $ID scan completed"
+                LogWrite_success "[$computer] $ID scan completed"
                 Write-Host "You selected an event ID that has not been parsed (i.e. the columns are jacked up)"
             }
 
@@ -67,10 +68,10 @@
         Catch {            
             if ($_.Exception -like "*No events were found that match criteria*") {           
                 Write-Warning "[$computer] $_" # TODO: create log file with failed event ID, computername, time, etc           
-                LogWrite_failure "[$computer]: no events found" 
+                LogWrite_failure "[$computer] EventID:$ID $_ no events found" 
             } else {            
                 Write-Warning "[$computer] Event ID:$ID $_"  # Something bad happened
-                LogWrite_failure "$computer EventID:$ID $_"         
+                LogWrite_failure ["$computer] EventID:$ID $_"         
             }            
         }
         Return            
@@ -101,19 +102,19 @@
             
             if ($ID -eq 106) {
                 $Events | Select-Object TaskName,UserContext,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
-                LogWrite_success "$computer taskCreated scan completed"
+                LogWrite_success "[$computer] taskCreated scan completed"
             } elseif ($ID -eq 200) {
                 $Events | Select-Object -Property TaskName,ActionName,TaskInstanceId,EnginePID,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
-                LogWrite_success "$computer taskStarted scan completed"
+                LogWrite_success "[$computer] taskStarted scan completed"
             } elseif ($ID -eq 201) {
                 $Events | Select-Object -Property TaskName,TaskInstanceId,ActionName,ResultCode,EnginePID,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName
-                LogWrite_success "$computer taskCompleted scan completed"
+                LogWrite_success "[$computer] taskCompleted scan completed"
             } elseif ($ID -eq 141) {
                 $Events | Select-Object -Property TaskName,UserName,Id,Version,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ActivityId,RelatedActivityId,ContainerLog,LevelDisplayName,OpcodeDisplayName,TaskDisplayName 
-                LogWrite_success "$computer taskDeleted scan completed"
+                LogWrite_success "[$computer] taskDeleted scan completed"
             } else {
                $Events | Select-Object *
-               LogWrite_success "$computer $ID scan completed"
+               LogWrite_success "[$computer] $ID scan completed"
                Write-Host "You selected an event ID that has not been normalized (i.e. the columns are jacked up)" 
             }   
         }
@@ -121,17 +122,17 @@
         Catch {
             if ($_.Exception -like "*No events were found that match criteria*") {           
                 Write-Warning "[$computer] $_" # TODO: create log file with failed event ID, computername, time, etc           
-                LogWrite_failure "[$computer]: no events found" 
+                LogWrite_failure "[$computer] EventID:$ID $_ no events found" 
             } else {            
                 Write-Warning "[$computer] Event ID:$ID $_"  # Something bad happened
-                LogWrite_failure "$computer EventID:$ID $_"         
+                LogWrite_failure "[$computer] EventID:$ID $_"         
             }  
         }
         Return
     }
     
-    $taskArray = @(7045)
-    if ($taskArray -like $ID) {
+    $SystemArray = @(7045)
+    if ($SystemArray -like $ID) {
         Try { 
             if ($time -like "hours") {
                 $hours = (Get-Date).AddHours(-1)  # AddHours function subtracts X hour from current time
@@ -155,27 +156,27 @@
             
             if ($ID -eq 7045) {
                 $Events | Select-Object ServiceName,ImagePath,ServiceType,StartType,AccountName,Id,Version,Qualifiers,Level,Task,Opcode,Keywords,RecordId,ProviderName,ProviderId,LogName,ProcessId,ThreadId,MachineName,UserId,TimeCreated,ContainerLog
-                LogWrite_success "$computer serviceCreated scan completed"
+                LogWrite_success "[$computer] serviceCreated scan completed"
             } else {
                $Events | Select-Object *
-               LogWrite_success "$computer $ID scan completed"
+               LogWrite_success "[$computer] $ID scan completed"
                Write-Host "You selected an event ID that has not been normalized (i.e. the columns are jacked up)"  
             }
         }
                 
         Catch {
             if ($_.Exception -like "*No events were found that match criteria*") {           
-                Write-Warning "[$computer] $_" # TODO: create log file with failed event ID, computername, time, etc           
-                LogWrite_failure "[$computer]: no events found" 
+                Write-Warning "[$computer] $_"            
+                LogWrite_failure "[$computer] EventID:$ID $_ no events found" 
             } else {            
                 Write-Warning "[$computer] Event ID:$ID $_"  # Something bad happened
-                LogWrite_failure "$computer EventID:$ID $_"         
+                LogWrite_failure "[$computer] EventID:$ID $_"         
             }  
         }
     }
     
     else {
-        Write-Host "I don't know how to process that Event-ID; Use Event ID-4624,4634,4688,4648,4672,106,200,201,or 141"
+        Write-Host "I don't know how to process that Event-ID; Use Event ID-4624,4625,4634,4688,4648,4672,106,200,201,141, or 7045"
         LogWrite_failure "[$computer]: I don't know how to process EventID:$ID"
     }
 }
@@ -254,15 +255,12 @@ Function LogWrite_failure
 function Get-Logs {
 param([string[]]$computernames,[int[]]$Event_ID,[string]$time,[bool]$test,[string]$cred)
 
-# Unblock-File 
-
-
 # create logfile to log computername, timestamp and 
 $USER = [Environment]::UserName 
 $LogfileSuccess = "C:\Users\$USER\Desktop\success.log"
 $LogfileFailure = "C:\Users\$USER\Desktop\failure.log"
 
-
+# hash table to correlate $Event_ID parameter to log name
 $hash_table = @{
     logon = 4624
     logoff = 4634
@@ -277,16 +275,17 @@ $hash_table = @{
     serviceCreated = 7045
 }
 
+# iterates over key:values in hash table to get log name
 foreach ($log_type in $hash_table.GetEnumerator()) {
     if ($log_type.Value -like $Event_ID) {
         $log_name = $log_type.Key
     }
 }
 
+# reads computer(s) from $computers command line argument, and attempts to ping it
 $USER = [Environment]::UserName  
     foreach ($computer in $computernames) {
         if ((Test-Connection -ComputerName $computer -Count 1 -ea 0) -and ($test -ne $true)) {
-            #Invoke-Command -ScriptBlock ${function:Get-LogsWorker} -ArgumentList $computer, $Event_ID, $time| Out-GridView  # use this for testing; prints output to excel like grid output
             Invoke-Command -ScriptBlock ${function:Get-LogsWorker} -ArgumentList $computer,$Event_ID, $time | Export-Csv C:\Users\$USER\Desktop\$computer-$log_name-$Event_ID.csv  
         } elseif ((Test-Connection -ComputerName $computer -Count 1 -ea 0) -and ($test = $true)) {
             Invoke-Command -ScriptBlock ${function:Get-LogsWorker} -ArgumentList $computer, $Event_ID, $time | Out-GridView   # use this for testing; prints output to excel like grid output
