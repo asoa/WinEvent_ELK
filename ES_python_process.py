@@ -27,7 +27,9 @@ import operator
 import os
 
 
-client = Elasticsearch()
+client = Elasticsearch(
+    hosts=[{"host": "127.0.0.1", "port": 9200}]
+)
 
 
 def check_white_list(hit):
