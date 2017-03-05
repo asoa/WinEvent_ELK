@@ -140,7 +140,7 @@ def main():
     start_time, end_time = get_epoch(s_time, e_time)
     response = query_elasticsearch(query, size, start_time, end_time)
     for hit in response['hits']['hits']:
-        hit_tuple = (hit["_source"]["TimeCreated"], hit["_source"]["MachineName"], hit["_source"]["SubjectUserName"], hit["_source"]["NewProcessName"], hit["_source"]["CommandLine"])
+        hit_tuple = (hit["_source"]["TimeCreated"], hit["_source"]["MachineName"], hit["_source"]["SubjectUserName"], hit["_source"]["NewProcessPath"], hit["_source"]["CommandLine"])
         # print(hit_tuple)
         hits.append(hit_tuple)
     suspect_exe, ordered_good_hit_dict = classify_bins(hits)
