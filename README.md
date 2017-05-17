@@ -12,10 +12,8 @@ The docker-compose.yml file and Elastic Stack conf files were derived from "http
 you through deploying a docker-compose Elastic Stack environment.
 
 ### PowerShell
-The PowerShell script uses PowerShell Remoting to distributively conduct parallel "Invoke-Command" commands on remote computers to run the PowerShell cmdlet "Get-WinEvent" to get Windows Logs->Security, and
-Application and Services Logs->TaskScheduler.  The PowerShell script requires PS-Remoting to be enabled in the windows environment; See PowerShell help file "get-help about_Remote_Requirements" for more information about
-the requirements to enable PowerShell Remoting.  In summary, you have to enable PS-Remoting on all computers that the script will run on.  The easiest way to do this is to create a GPO that enables the WinRM service and 
-corresponding firewall rules to allow the traffic.  Another way is to use Psexec to programmatically run "winrm.cmd quickconfig -q" on remote computers.
+The PowerShell script uses PowerShell Remoting to distributively conduct "Invoke-Command" commands on remote computers to run the PowerShell cmdlet "Get-WinEvent" to get Windows Logs->Security, and
+Application and Services Logs->TaskScheduler. 
 
 ### Usage
 Again, this repo provides a docker-compose.yml file to quickly deploy an Elastic Stack using the official Elasticsearch,Logstash,and Kibana images hosted on https://hub.docker.com.  The requirements to deploy the Elastic Stack using the
@@ -54,4 +52,7 @@ From the docs: "Official low-level client for Elasticsearch. Its goal is to prov
 For a more high level client library with more limited scope, have a look at elasticsearch-dsl - it is a more pythonic library sitting on top of elasticsearch-py."
 
 How this project uses elasticsearch-py: to programmatically query data in the elasticsearch database using Apache Lucene syntax to "find all the things." 
+
+### Troubleshooting
+
 
